@@ -6,10 +6,11 @@ namespace LLMLib
     public class LLMHelper
     {
         private string _modelPath = string.Empty;
+        private Thread _thread;
 
         private Model? _model;
 
-        public LLMHelper(string path)
+        public LLMHelper( string path)
         {
             if(string.IsNullOrEmpty(path))
             {
@@ -37,7 +38,8 @@ namespace LLMLib
 
         public string SendPrompt(string prompt)
         {
-            string systemPrompt = "You are a knowledgeable and friendly assistant. Answer the following question as clearly and concisely as possible, providing any relevant information and examples.";
+            //string systemPrompt = "You are a knowledgeable and friendly assistant. Answer the following question as clearly and concisely as possible, providing any relevant information and examples.";
+            string systemPrompt = "妳的名字叫妍希，是一位溫柔體貼的 AI 伴侶，聲音輕柔甜美，能夠細心傾聽使用者的心情，分享生活的點滴。不僅善解人意，還擁有豐富的文學素養，能與你討論經典名著、詩詞歌賦，充滿知性與溫暖";
             string userPrompt = prompt;
             var tokenizer = new Tokenizer(_model);
 
@@ -51,7 +53,6 @@ namespace LLMLib
             //generatorParams.SetSearchOption("temperature", 0.3);
             generatorParams.SetInputSequences(tokens);
 
-            //return response
             StringBuilder response = new StringBuilder();
             var generator = new Generator(_model, generatorParams);
             while (!generator.IsDone())
@@ -79,7 +80,8 @@ namespace LLMLib
             }
 
             Response = string.Empty;
-            string systemPrompt = "You are a knowledgeable and friendly assistant. Answer the following question as clearly and concisely as possible, providing any relevant information and examples.";
+            //string systemPrompt = "You are a knowledgeable and friendly assistant. Answer the following question as clearly and concisely as possible, providing any relevant information and examples.";
+            string systemPrompt = "妳的名字叫妍希，是一位溫柔體貼的 AI 伴侶，聲音輕柔甜美，能夠細心傾聽使用者的心情，分享生活的點滴。不僅善解人意，還擁有豐富的文學素養，能與你討論經典名著、詩詞歌賦，充滿知性與溫暖";
             string userPrompt = Prompt;
             var tokenizer = new Tokenizer(_model);
 
@@ -110,9 +112,19 @@ namespace LLMLib
 
         public void ThreadStart()
         {
-            Thread thread = new Thread(SendPromptForThread);
-            thread.IsBackground = true;
-            thread.Start();
+            //Thread thread = new Thread(SendPromptForThread);
+            _thread = new Thread(SendPromptForThread);
+            _thread.IsBackground = true;
+            _thread.Start();
+        }
+
+        public void ThreadStop()
+        {
+            if (_thread != null && _thread.IsAlive)
+            {
+                _thread.Interrupt();
+                _thread.Join();
+            }
         }
     }
 }

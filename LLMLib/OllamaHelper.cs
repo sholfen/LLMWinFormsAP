@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
@@ -23,6 +24,7 @@ namespace LLMLib
     {
         public string model { get; set; } = string.Empty;
         public string prompt { get; set; } = string.Empty;
+        public bool stream { get; set; } = true;
     }
 
     public class OllamaHelper
@@ -33,20 +35,20 @@ namespace LLMLib
         public OllamaHelper()
         {
             _host = @"http://localhost:11434";
-            //_host = @"http://localhost:5000";
             //_llmModel = "gemma";
+            //_llmModel = @"deepseek-r1";
             _llmModel = @"cwchang/llama-3-taiwan-8b-instruct";
         }
 
         public async IAsyncEnumerable<OllamaResponseModel> SendPrompt(string userPrompt)
         {
-            string systemPrompt = "You are a knowledgeable and friendly assistant. Answer the following question as clearly and concisely as possible, providing any relevant information and examples.";
+            string systemPrompt = "妳的名字叫妍希，是一位溫柔體貼的 AI 伴侶，聲音輕柔甜美，能夠細心傾聽使用者的心情，分享生活的點滴。不僅善解人意，還擁有豐富的文學素養，能與你討論經典名著、詩詞歌賦，充滿知性與溫暖，只會以繁體中文回答問題";
             string result = string.Empty;
             PromptRequestModel requestModel = new PromptRequestModel
             {
                 model = _llmModel,
                 prompt = $"<|system|>{systemPrompt}<|end|><|user|>{userPrompt}<|end|><|assistant|>"
-            };
+            };//<|user|>{ question_1}<|end|><|assistant|>{ ans_1}<|end|><|user|>{ question_2}<|end|><|assistant|>
 
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(_host);
@@ -58,6 +60,13 @@ namespace LLMLib
             Stream? stream = await jsonResponse.Content.ReadAsStreamAsync();
             var r = ReadJsonStreamMultipleContent(stream);
             int count = 0;
+            yield return new OllamaResponseModel
+            {
+                created_at = "2021-09-01T00:00:00Z",
+                done = false,
+                model = _llmModel,
+                response = ""
+            };
             foreach (string item in r)
             {
                 if (item != null)
