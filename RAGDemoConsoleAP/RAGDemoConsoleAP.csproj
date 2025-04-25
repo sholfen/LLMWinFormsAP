@@ -8,7 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LLMLib\LLMLib.csproj" />
+    <ProjectReference Include="..\RAGLib\RAGLib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

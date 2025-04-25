@@ -9,8 +9,8 @@ namespace LLMWinFormsAP
 
         public MainForm()
         {
-            _LLMHelper = new LLMHelper();
-            _LLMHelper.Load();
+            //_LLMHelper = new LLMHelper();
+            //_LLMHelper.Load();
             _OllamaHelper = new OllamaHelper();
             InitializeComponent();
         }
@@ -27,9 +27,16 @@ namespace LLMWinFormsAP
 
             //Ollama
             txtResponse.Text = "«ä¦Ò¤¤...";
-            var response = _OllamaHelper.SendPrompt(txtPrompt.Text);
+            //var response = _OllamaHelper.SendPrompt(txtPrompt.Text);
+            var response = _OllamaHelper.SendPromptWithRAG(txtPrompt.Text);
+            bool flag = true;
             await foreach (var item in response)
             {
+                if (flag)
+                {
+                    txtResponse.Text = string.Empty;
+                    flag = false;
+                }
                 txtResponse.Text += item.response;
             }
         }

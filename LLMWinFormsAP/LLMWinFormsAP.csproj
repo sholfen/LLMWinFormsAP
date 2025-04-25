@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -39,6 +39,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Images\0228_800x1200_nofix_00010_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

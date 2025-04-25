@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LLMLib", "LLMLib\LLMLib.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LLMConsoleAP", "LLMConsoleAP\LLMConsoleAP.csproj", "{E875EF3B-B259-4AB6-A414-723E3BE29551}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAGLib", "RAGLib\RAGLib.csproj", "{543C1A41-EC40-43D6-B4B8-6A6A856F2732}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAGDemoConsoleAP", "RAGDemoConsoleAP\RAGDemoConsoleAP.csproj", "{A5699DED-366F-41CF-8D5C-0A7A0F9BA3FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{E875EF3B-B259-4AB6-A414-723E3BE29551}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E875EF3B-B259-4AB6-A414-723E3BE29551}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E875EF3B-B259-4AB6-A414-723E3BE29551}.Release|Any CPU.Build.0 = Release|Any CPU
+		{543C1A41-EC40-43D6-B4B8-6A6A856F2732}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{543C1A41-EC40-43D6-B4B8-6A6A856F2732}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{543C1A41-EC40-43D6-B4B8-6A6A856F2732}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{543C1A41-EC40-43D6-B4B8-6A6A856F2732}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5699DED-366F-41CF-8D5C-0A7A0F9BA3FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5699DED-366F-41CF-8D5C-0A7A0F9BA3FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5699DED-366F-41CF-8D5C-0A7A0F9BA3FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5699DED-366F-41CF-8D5C-0A7A0F9BA3FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -22,8 +22,6 @@ namespace LLMLib
         public LLMHelper()
         {
             SetModelPath("D:\\LLM\\onnx\\Phi-3-mini-4k-instruct-onnx\\cuda\\cuda-fp16");
-            //SetModelPath("D:\\LLM\\onnx\\Phi-3-small-8k-instruct-onnx-cuda\\cuda-int4-rtn-block-32");
-            //SetModelPath("D:\\LLM\\onnx\\Phi-3-medium-128k-instruct-onnx-cuda\\cuda-fp16");
         }
 
         private void SetModelPath(string modelPath)
