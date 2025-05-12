@@ -34,7 +34,7 @@ namespace RAGLib.VectorDB.Qdrant
             if (!_qdrantClient.CollectionExistsAsync(_colName).Result)
             {
                 _qdrantClient.CreateCollectionAsync(_colName,
-                    new VectorParams { Size = 1536, Distance = Distance.Cosine }).Wait();//1536,768
+                    new VectorParams { Size = configModel.VectorSize, Distance = Distance.Cosine }).Wait();
             }
 
             var count = _qdrantClient.CountAsync(_colName).Result;
@@ -62,7 +62,7 @@ namespace RAGLib.VectorDB.Qdrant
             httpClient.BaseAddress = new Uri(_ollamaHost);
             var requestModel = new
             {
-                model = "nomic-embed-text",
+                model = @"tazarov/all-minilm-l6-v2-f32",
                 input = textData.text
             };
             var jsonResponse = await httpClient.PostAsJsonAsync(@"/api/embed", requestModel);
@@ -70,13 +70,26 @@ namespace RAGLib.VectorDB.Qdrant
             StreamReader sr = new StreamReader(stream);
             string jsonStr = sr.ReadToEnd();
             var embeddingResult = System.Text.Json.JsonSerializer.Deserialize<EmbeddingResult>(jsonStr);
+            Console.WriteLine($"Printing embedding result: {textData.text}");
+            int count = 0;
+            foreach (var vectors in embeddingResult.embeddings)
+            {
+                foreach (var vector in vectors)
+                {
+                    Console.Write($"{vector} ");
+                }
+                count++;
+            }
+            Console.WriteLine();
+            Console.WriteLine($"Printing embedding result count: {count}");
+            Console.WriteLine();
             return embeddingResult.embeddings[0];
         }
 
         public float[] GetEmbeddingsByAzure(string text)
         {
-            var endpoint = new Uri("https://peterrag.openai.azure.com/");
-            var apiKey = "<your key>";
+            var endpoint = new Uri("your domain");
+            var apiKey = "api key";
             var deploymentName = "text-embedding-3-small";
 
             var credential = new AzureKeyCredential(apiKey);
@@ -103,8 +116,8 @@ namespace RAGLib.VectorDB.Qdrant
                 {
 
                     Id = id,
-                    //Vectors = GetEmbeddings(t).Result,
-                    Vectors = GetEmbeddingsByAzure(t.text),
+                    Vectors = GetEmbeddings(t).Result,
+                    //Vectors = GetEmbeddingsByAzure(t.text),
                     Payload =
                     {
                             ["catg"] = catg,
@@ -117,11 +130,11 @@ namespace RAGLib.VectorDB.Qdrant
 
         public async Task<string[]> Query(TextData textData)
         {
-            var client = new QdrantClient("localhost", 6334, false, "3065678qazwsx");
+            //var client = new QdrantClient("localhost", 6334, false, "3065678qazwsx");
             string keywd = textData.text;
-            //var queryVector = await GetEmbeddings(textData);
-            var queryVector =   GetEmbeddingsByAzure(textData.text);
-            var answers = await client.SearchAsync(
+            var queryVector = await GetEmbeddings(textData);
+            //var queryVector =   GetEmbeddingsByAzure(textData.text);
+            var answers = await _qdrantClient.SearchAsync(
                 _colName,
                 queryVector,
                 filter: Conditions.MatchText("catg", textData.catg),

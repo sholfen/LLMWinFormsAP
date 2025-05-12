@@ -14,9 +14,9 @@
   },
   "QdrantDbConnection": {
     "Host": "localhost",
-    "Port": 6333,
+    "Port": 6334,
     "ApiKey": "3065678qazwsx",
     "CollectionName": "text_embedding",
-    "VectorSize": 1536
+    "VectorSize": 384
   }
 }
