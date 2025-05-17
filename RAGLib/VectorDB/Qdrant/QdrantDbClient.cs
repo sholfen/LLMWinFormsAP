@@ -16,6 +16,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Collections.Immutable;
 using OpenAI.Embeddings;
 using static System.Net.Mime.MediaTypeNames;
+using System.Dynamic;
 
 namespace RAGLib.VectorDB.Qdrant
 {
@@ -88,15 +89,20 @@ namespace RAGLib.VectorDB.Qdrant
 
         public float[] GetEmbeddingsByAzure(string text)
         {
-            var endpoint = new Uri("your domain");
-            var apiKey = "api key";
-            var deploymentName = "text-embedding-3-small";
+            StreamReader sr = new StreamReader(@"Config.json");
+            string jsonStr = sr.ReadToEnd();
+            dynamic jsonModel = System.Text.Json.JsonSerializer.Deserialize<ExpandoObject>(jsonStr);
+            AzureConfigModel? azureConfigModel = System.Text.Json.JsonSerializer.Deserialize<AzureConfigModel>(jsonModel.AzureAPI.ToString());
+
+
+            var endpoint = new Uri(azureConfigModel.Host);
+            var apiKey = azureConfigModel.ApiKey;
 
             var credential = new AzureKeyCredential(apiKey);
             AzureKeyCredential credentials = new(apiKey);
 
             AzureOpenAIClient azureOpenAIClient = new AzureOpenAIClient(endpoint, credentials);
-            var embeddingClient = azureOpenAIClient.GetEmbeddingClient(deploymentName);
+            var embeddingClient = azureOpenAIClient.GetEmbeddingClient(_deploymentName);
 
             var r = embeddingClient.GenerateEmbedding(text);
             var embedding = r.Value;
