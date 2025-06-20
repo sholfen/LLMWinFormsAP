@@ -1,0 +1,5 @@
+{
+  "ConnectionString": {
+    "Local": "Your DB"
+  }
+}

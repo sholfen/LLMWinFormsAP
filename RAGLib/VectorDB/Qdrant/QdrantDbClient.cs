@@ -1,6 +1,5 @@
 ﻿using Azure.AI.OpenAI;
 using Azure;
-//using OpenAI.Embeddings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +8,8 @@ using System.Threading.Tasks;
 using RAGLib.Models;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using Google.Protobuf.WellKnownTypes;
 using System.Net.Http.Json;
-using System.Runtime.InteropServices.JavaScript;
-using System.Collections.Immutable;
 using OpenAI.Embeddings;
-using static System.Net.Mime.MediaTypeNames;
 using System.Dynamic;
 
 namespace RAGLib.VectorDB.Qdrant
@@ -24,7 +18,6 @@ namespace RAGLib.VectorDB.Qdrant
     {
         private readonly string _deploymentName;
         private readonly string _colName = "text_embedding";
-        //private readonly EmbeddingClient _embeddingClient;
         private readonly QdrantClient _qdrantClient;
         private readonly string _ollamaHost = @"http://localhost:11434";
 

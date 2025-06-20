@@ -33,6 +33,7 @@
             txtPrompt = new TextBox();
             btnStop = new Button();
             picConver = new PictureBox();
+            btnPromptTest = new Button();
             ((System.ComponentModel.ISupportInitialize)picConver).BeginInit();
             SuspendLayout();
             // 
@@ -91,11 +92,22 @@
             picConver.TabIndex = 5;
             picConver.TabStop = false;
             // 
+            // btnPromptTest
+            // 
+            btnPromptTest.Location = new Point(567, 528);
+            btnPromptTest.Name = "btnPromptTest";
+            btnPromptTest.Size = new Size(75, 23);
+            btnPromptTest.TabIndex = 6;
+            btnPromptTest.Text = "Prompt Test";
+            btnPromptTest.UseVisualStyleBackColor = true;
+            btnPromptTest.Click += btnPromptTest_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(794, 565);
+            Controls.Add(btnPromptTest);
             Controls.Add(picConver);
             Controls.Add(btnStop);
             Controls.Add(txtPrompt);
@@ -116,5 +128,6 @@
         private TextBox txtPrompt;
         private Button btnStop;
         private PictureBox picConver;
+        private Button btnPromptTest;
     }
 }

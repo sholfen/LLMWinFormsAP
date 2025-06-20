@@ -27,7 +27,23 @@ namespace LLMWinFormsAP
 
             //Ollama
             txtResponse.Text = "思考中...";
-            //var response = _OllamaHelper.SendPrompt(txtPrompt.Text);
+            var response = _OllamaHelper.SendPrompt(txtPrompt.Text);
+           
+            bool flag = true;
+            await foreach (var item in response)
+            {
+                if (flag)
+                {
+                    txtResponse.Text = string.Empty;
+                    flag = false;
+                }
+                txtResponse.Text += item.response;
+            }
+        }
+
+        private async void btnSendRAG_Click(object sender, EventArgs e)
+        {
+            txtResponse.Text = "思考中...";
             var response = _OllamaHelper.SendPromptWithRAG(txtPrompt.Text);
             bool flag = true;
             await foreach (var item in response)
@@ -44,6 +60,13 @@ namespace LLMWinFormsAP
         private void btnStop_Click(object sender, EventArgs e)
         {
             _LLMHelper.ThreadStop();
+        }
+
+        private async void btnPromptTest_Click(object sender, EventArgs e)
+        {
+            txtResponse.Text = "思考中...";
+            var response = await _OllamaHelper.GetCategoryByPrompt(txtPrompt.Text);
+            txtResponse.Text = System.Text.Json.JsonSerializer.Serialize(response);
         }
     }
 }

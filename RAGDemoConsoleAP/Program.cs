@@ -1,5 +1,6 @@
 ﻿
 using LLMLib;
+using LLMLib.Models;
 using RAGLib.Models;
 using RAGLib.VectorDB.Qdrant;
 using System.Net;

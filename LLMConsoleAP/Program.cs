@@ -26,7 +26,7 @@ LLMExtensionHelper lLMExtensionHelper = new LLMExtensionHelper();
 LLMExtensionHelper.Host = azureConfigModel.Host;
 LLMExtensionHelper.ApiKey = azureConfigModel.ApiKey;
 //await lLMExtensionHelper.AIChatTest();
-await lLMExtensionHelper.AIChatTest2();
+await lLMExtensionHelper.AIChatTest3();
 
 public class AzureConfigModel
 {

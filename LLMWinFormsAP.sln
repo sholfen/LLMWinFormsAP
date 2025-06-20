@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAGLib", "RAGLib\RAGLib.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAGDemoConsoleAP", "RAGDemoConsoleAP\RAGDemoConsoleAP.csproj", "{A5699DED-366F-41CF-8D5C-0A7A0F9BA3FD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FineTuningToolWinFormsAP", "FineTuningToolWinFormsAP\FineTuningToolWinFormsAP.csproj", "{5A3BDE5D-6F82-4ADD-8C90-AF0320C27AFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{A5699DED-366F-41CF-8D5C-0A7A0F9BA3FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5699DED-366F-41CF-8D5C-0A7A0F9BA3FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5699DED-366F-41CF-8D5C-0A7A0F9BA3FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A3BDE5D-6F82-4ADD-8C90-AF0320C27AFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A3BDE5D-6F82-4ADD-8C90-AF0320C27AFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A3BDE5D-6F82-4ADD-8C90-AF0320C27AFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A3BDE5D-6F82-4ADD-8C90-AF0320C27AFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
