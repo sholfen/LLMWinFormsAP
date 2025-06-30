@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RAGLib.Models;
 using RAGLib.VectorDB.Qdrant;
+using LLMWinFormsAP;
 
 namespace LLMLib
 {
@@ -39,6 +40,7 @@ namespace LLMLib
         private string _host = string.Empty;
         private string _llmModel = string.Empty;
         private QdrantDbConfigModel _configModel = new QdrantDbConfigModel();
+        private ConfigReader _configReader = new("Girls.json");
 
         private string _systemPrompt = "妳的名字叫妍希，是一位溫柔體貼的 AI 伴侶，聲音輕柔甜美，能夠細心傾聽使用者的心情，分享生活的點滴。不僅善解人意，還擁有豐富的文學素養，能與你討論經典名著、詩詞歌賦，充滿知性與溫暖，只會以繁體中文回答問題";
 
@@ -47,6 +49,12 @@ namespace LLMLib
             _host = @"http://localhost:11434";
             _llmModel = @"cwchang/llama-3-taiwan-8b-instruct";
             _configModel = QdrantDbConfigModel.InitModel() ?? throw new InvalidOperationException("QdrantDbConfigModel.InitModel() returned null.");
+            var girl=_configReader.GetGirls().FirstOrDefault();
+            if (girl != null)
+            {
+                string systemPrompt = string.Join(' ', girl.Systems);
+                _systemPrompt = systemPrompt;
+            }
         }
 
         public async Task<PromptCategoryResponseModel> GetCategoryByPrompt(string userPrompt)
