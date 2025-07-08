@@ -8,9 +8,9 @@ namespace LLMLib.Repositories.Interfaces
 {
     public interface IChatHistoryRepository
     {
-        void AddUserMessage(string message);
-        void AddAssistantMessage(string message);
-        List<Microsoft.Extensions.AI.ChatMessage> GetChatHistory();
-        void ClearChatHistory();
+        void AddUserMessage(string toekn, string message);
+        void AddAssistantMessage(string toekn, string message);
+        List<Microsoft.Extensions.AI.ChatMessage> GetChatHistory(string toekn);
+        void ClearChatHistory(string toekn);
     }
 }

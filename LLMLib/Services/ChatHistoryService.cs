@@ -8,31 +8,30 @@ using System.Threading.Tasks;
 namespace LLMLib.Services
 {
     public class ChatHistoryService
-    {        
+    {
         private IChatHistoryRepository _chatHistoryRepository;
 
         public ChatHistoryService()
         {
-            _chatHistoryRepository = new LLMLib.Repositories.Implements.ChatHistoryRepository();
-            // Initialize with a system message if needed
-            _chatHistoryRepository.AddAssistantMessage("You are a helpful assistant.");   
+            _chatHistoryRepository = new Repositories.Implements.ChatHistoryRepository();
+            //_chatHistoryRepository.AddAssistantMessage(string.Empty, "You are a helpful assistant.");
         }
 
-        public void AddUserMessage(string message)
+        public void AddUserMessage(string token, string message)
         {
-            _chatHistoryRepository.AddAssistantMessage(message);
+            _chatHistoryRepository.AddAssistantMessage(token, message);
         }
-        public void AddAssistantMessage(string message)
+        public void AddAssistantMessage(string token, string message)
         {
-            _chatHistoryRepository.AddAssistantMessage(message);
+            _chatHistoryRepository.AddAssistantMessage(token, message);
         }
-        public List<Microsoft.Extensions.AI.ChatMessage> GetChatHistory()
+        public List<Microsoft.Extensions.AI.ChatMessage> GetChatHistory(string token)
         {
-            return _chatHistoryRepository.GetChatHistory();
+            return _chatHistoryRepository.GetChatHistory(token);
         }
-        public void ClearChatHistory()
+        public void ClearChatHistory(string token)
         {
-            _chatHistoryRepository.ClearChatHistory();
+            _chatHistoryRepository.ClearChatHistory(token);
         }
     }
 }

@@ -49,10 +49,10 @@ namespace LLMLib
             _host = @"http://localhost:11434";
             _llmModel = @"cwchang/llama-3-taiwan-8b-instruct";
             _configModel = QdrantDbConfigModel.InitModel() ?? throw new InvalidOperationException("QdrantDbConfigModel.InitModel() returned null.");
-            var girl=_configReader.GetGirls().FirstOrDefault();
+            var girl = _configReader.GetGirls().FirstOrDefault();
             if (girl != null)
             {
-                string systemPrompt = string.Join(' ', girl.Systems);
+                string systemPrompt = string.Join('。', girl.Systems);
                 _systemPrompt = systemPrompt;
             }
         }
