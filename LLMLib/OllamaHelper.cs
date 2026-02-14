@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using RAGLib.Models;
 using RAGLib.VectorDB.Qdrant;
 using LLMWinFormsAP;
+using LLMLib.Repositories.Interfaces;
+using LLMLib.Repositories.Implements;
 
 namespace LLMLib
 {
@@ -41,13 +43,16 @@ namespace LLMLib
         private string _llmModel = string.Empty;
         private QdrantDbConfigModel _configModel = new QdrantDbConfigModel();
         private ConfigReader _configReader = new("Girls.json");
+        private IChatHistoryRepository _chatHistoryRepository = new ChatHistoryRepository();
+        private string _token = Guid.NewGuid().ToString();
 
         private string _systemPrompt = "妳的名字叫妍希，是一位溫柔體貼的 AI 伴侶，聲音輕柔甜美，能夠細心傾聽使用者的心情，分享生活的點滴。不僅善解人意，還擁有豐富的文學素養，能與你討論經典名著、詩詞歌賦，充滿知性與溫暖，只會以繁體中文回答問題";
 
         public OllamaHelper()
         {
             _host = @"http://localhost:11434";
-            _llmModel = @"cwchang/llama-3-taiwan-8b-instruct";
+            //_llmModel = @"cwchang/llama-3-taiwan-8b-instruct";
+            _llmModel = @"cwchang/llama3-taide-lx-8b-chat-alpha1";
             _configModel = QdrantDbConfigModel.InitModel() ?? throw new InvalidOperationException("QdrantDbConfigModel.InitModel() returned null.");
             var girl = _configReader.GetGirls().FirstOrDefault();
             if (girl != null)
@@ -93,6 +98,7 @@ namespace LLMLib
 
         public async IAsyncEnumerable<OllamaResponseModel> SendPrompt(string userPrompt)
         { 
+            _chatHistoryRepository.AddUserMessage(_token, userPrompt);
             string result = string.Empty;
             PromptRequestModel requestModel = new PromptRequestModel
             {
@@ -108,6 +114,7 @@ namespace LLMLib
             Stream? stream = await jsonResponse.Content.ReadAsStreamAsync();
             var r = ReadJsonStreamMultipleContent(stream);
             int count = 0;
+            StringBuilder stringBuilder = new StringBuilder();
             yield return new OllamaResponseModel
             {
                 created_at = "2021-09-01T00:00:00Z",
@@ -120,11 +127,13 @@ namespace LLMLib
                 if (item != null)
                 {
                     var i = System.Text.Json.JsonSerializer.Deserialize<OllamaResponseModel>(item);
+                    stringBuilder.Append(i.response.Trim());
                     yield return i;
                 }
                 await Task.Delay(1);
                 count++;
             }
+            _chatHistoryRepository.AddUserMessage(_token, stringBuilder.ToString());
         }
 
         public async IAsyncEnumerable<OllamaResponseModel> SendPromptWithRAG(string userPrompt)

@@ -30,7 +30,7 @@ string prompt = "真人影像，一個面帶微笑的女高中生，在外面逛
 string response = await textToImageHelper.GetImage(prompt);
 Console.WriteLine(response);
 
-ImageResult imageResult = System.Text.Json.JsonSerializer.Deserialize<ImageResult>(response);
+ImageResult? imageResult = System.Text.Json.JsonSerializer.Deserialize<ImageResult>(response);
 if (imageResult != null && (imageResult.data != null && imageResult.data.Count() != 0))
 {
     Console.WriteLine($"Revised Prompt: {imageResult.data[0].revised_prompt}");
