@@ -1,4 +1,10 @@
-﻿using Microsoft.VisualBasic;
+﻿using LLMLib.Repositories.Implements;
+using LLMLib.Repositories.Interfaces;
+using LLMWinFormsAP;
+using Microsoft.Extensions.AI;
+using Microsoft.VisualBasic;
+using RAGLib.Models;
+using RAGLib.VectorDB.Qdrant;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,11 +13,7 @@ using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
-using RAGLib.Models;
-using RAGLib.VectorDB.Qdrant;
-using LLMWinFormsAP;
-using LLMLib.Repositories.Interfaces;
-using LLMLib.Repositories.Implements;
+using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 
 namespace LLMLib
 {
@@ -46,13 +48,20 @@ namespace LLMLib
         private IChatHistoryRepository _chatHistoryRepository = new ChatHistoryRepository();
         private string _token = Guid.NewGuid().ToString();
 
+        private IChatClient? _ollamaClient = null;
+        private List<ChatMessage> _chatMessages = new List<ChatMessage>();
+
+        public void SetChatMessages(List<ChatMessage> chatMessages) => _chatMessages = chatMessages;
+
+
         private string _systemPrompt = "妳的名字叫妍希，是一位溫柔體貼的 AI 伴侶，聲音輕柔甜美，能夠細心傾聽使用者的心情，分享生活的點滴。不僅善解人意，還擁有豐富的文學素養，能與你討論經典名著、詩詞歌賦，充滿知性與溫暖，只會以繁體中文回答問題";
 
         public OllamaHelper()
         {
             _host = @"http://localhost:11434";
             //_llmModel = @"cwchang/llama-3-taiwan-8b-instruct";
-            _llmModel = @"cwchang/llama3-taide-lx-8b-chat-alpha1";
+            //_llmModel = @"cwchang/llama3-taide-lx-8b-chat-alpha1";
+            _llmModel = "gemma4:e4b";
             _configModel = QdrantDbConfigModel.InitModel() ?? throw new InvalidOperationException("QdrantDbConfigModel.InitModel() returned null.");
             var girl = _configReader.GetGirls().FirstOrDefault();
             if (girl != null)
@@ -60,6 +69,8 @@ namespace LLMLib
                 string systemPrompt = string.Join('。', girl.Systems);
                 _systemPrompt = systemPrompt;
             }
+
+            _ollamaClient = new OllamaSharp.OllamaApiClient(new Uri(_host), _llmModel);
         }
 
         public async Task<PromptCategoryResponseModel> GetCategoryByPrompt(string userPrompt)
@@ -178,6 +189,25 @@ namespace LLMLib
                 await Task.Delay(1);
                 count++;
             }
+        }
+
+        public async IAsyncEnumerable<ChatResponseUpdate> SendPromptWithChatMessages(string userPrompt)
+        {
+            if(_ollamaClient == null) throw new InvalidOperationException("LLM client is not set.");
+            string result = string.Empty;
+            if (_chatMessages.Count == 0 || _chatMessages[0].Role != ChatRole.System)
+            {
+                _chatMessages.Insert(0, new ChatMessage(ChatRole.System, _systemPrompt));
+            }
+            _chatMessages.Add(new ChatMessage(ChatRole.User, userPrompt));
+
+            StringBuilder sb = new StringBuilder();
+            await foreach (var update in _ollamaClient.GetStreamingResponseAsync(_chatMessages))
+            {
+                sb.Append(update.Text);
+                yield return update;
+            }
+            _chatMessages.Add(new ChatMessage(ChatRole.Assistant, sb.ToString()));
         }
 
         public IEnumerable<string?> ReadJsonStreamMultipleContent(Stream stream)

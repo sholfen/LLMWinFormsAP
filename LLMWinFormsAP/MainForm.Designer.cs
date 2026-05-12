@@ -34,6 +34,8 @@
             btnStop = new Button();
             picConver = new PictureBox();
             btnPromptTest = new Button();
+            btnPromptWithHistory = new Button();
+            resMarkdownViewer = new CDS.Markdown.MarkdownViewer();
             ((System.ComponentModel.ISupportInitialize)picConver).BeginInit();
             SuspendLayout();
             // 
@@ -57,7 +59,6 @@
             txtResponse.ScrollBars = ScrollBars.Vertical;
             txtResponse.Size = new Size(436, 225);
             txtResponse.TabIndex = 2;
-            txtResponse.Text = "Answer";
             // 
             // txtPrompt
             // 
@@ -102,11 +103,30 @@
             btnPromptTest.UseVisualStyleBackColor = true;
             btnPromptTest.Click += btnPromptTest_Click;
             // 
+            // btnPromptWithHistory
+            // 
+            btnPromptWithHistory.Location = new Point(77, 528);
+            btnPromptWithHistory.Name = "btnPromptWithHistory";
+            btnPromptWithHistory.Size = new Size(134, 23);
+            btnPromptWithHistory.TabIndex = 6;
+            btnPromptWithHistory.Text = "Prompt With History";
+            btnPromptWithHistory.UseVisualStyleBackColor = true;
+            btnPromptWithHistory.Click += btnPromptWithHistory_Click;
+            // 
+            // resMarkdownViewer
+            // 
+            resMarkdownViewer.Location = new Point(791, 30);
+            resMarkdownViewer.Name = "resMarkdownViewer";
+            resMarkdownViewer.Size = new Size(520, 474);
+            resMarkdownViewer.TabIndex = 0;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(794, 565);
+            ClientSize = new Size(1323, 565);
+            Controls.Add(resMarkdownViewer);
+            Controls.Add(btnPromptWithHistory);
             Controls.Add(btnPromptTest);
             Controls.Add(picConver);
             Controls.Add(btnStop);
@@ -129,5 +149,7 @@
         private Button btnStop;
         private PictureBox picConver;
         private Button btnPromptTest;
+        private Button btnPromptWithHistory;
+        private CDS.Markdown.MarkdownViewer resMarkdownViewer;
     }
 }
