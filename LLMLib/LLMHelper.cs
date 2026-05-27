@@ -66,7 +66,7 @@ namespace LLMLib
                 new ChatClientAgentOptions
                 {
                     Name = "llama3.1:latest",
-                    Instructions = "你現在是個笑話專家。",
+                    //Instructions = "你現在是個笑話專家。",
                     Description = "一個可以講海盜笑話的笑話專家代理人。",
                 });
 

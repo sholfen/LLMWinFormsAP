@@ -1,5 +1,5 @@
 {
   "ConnectionString": {
-    "Local": "Your DB"
+    "Local": "Server=localhost;Database=demo;Uid=root;Pwd=123456;"
   }
 }
