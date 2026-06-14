@@ -194,5 +194,11 @@ namespace LLMLib
             LLMHelper lLMHelper = new LLMHelper();
             await lLMHelper.RunAgentsAISampleAsync();
         }
+
+        public async Task AIChatTest6()
+        {
+            LLMHelper lLMHelper = new LLMHelper();
+            await lLMHelper.TestMCPServer();
+        }
     }
 }

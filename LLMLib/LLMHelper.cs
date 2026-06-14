@@ -1,7 +1,10 @@
 ﻿using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using Microsoft.ML.OnnxRuntimeGenAI;
+using ModelContextProtocol;
+using ModelContextProtocol.Client;
 using OpenAI.Chat;
+using OpenAI.Responses;
 using System.Text;
 
 namespace LLMLib
@@ -52,6 +55,43 @@ namespace LLMLib
             {
                 _thread.Interrupt();
                 _thread.Join();
+            }
+        }
+
+        public async Task TestMCPServer()
+        {
+            var serverBase = new Uri("http://localhost:5000/");
+            // 自動處理與伺服器之間的雙向連線
+            var transport = new HttpClientTransport(new HttpClientTransportOptions
+            {
+                Endpoint = serverBase
+            });
+            // 使用 await using 確保程式結束時，連線資源會被正確釋放
+            await using var client = await McpClient.CreateAsync(transport);
+            Console.WriteLine("連線成功！\n");
+
+            // 取得並列出伺服器上所有可用的工具
+            var toolsResult = await client.ListToolsAsync();
+            var otherAIFunctions = new List<AITool>();
+            Console.WriteLine("【伺服器提供的工具列表】");
+            foreach (var tool in toolsResult)
+            {
+                Console.WriteLine($"- {tool.Name} : {tool.Description}");
+                otherAIFunctions.Add(tool);
+            }
+            Console.WriteLine();
+
+            string model = @"llama3.1:latest";
+            IChatClient chatClient = new OllamaSharp.OllamaApiClient(new Uri("http://localhost:11434"), model);
+            IChatClient clientWithTools = new FunctionInvokingChatClient(chatClient);
+            var chatOptions = new ChatOptions
+            {
+                Tools = otherAIFunctions
+            };
+
+            await foreach (var update in clientWithTools.GetStreamingResponseAsync("告訴我Apple筆電的價格是多少？", chatOptions))
+            {
+                Console.Write(update);
             }
         }
 

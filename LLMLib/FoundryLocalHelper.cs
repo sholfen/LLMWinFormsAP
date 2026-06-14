@@ -48,17 +48,9 @@ namespace LLMLib
                     return;
                 }
 
-
                 var manager = FoundryLocalManager.Instance;
                 _catalog = await manager.GetCatalogAsync(ct);
                 IModel? model = await _catalog.GetModelAsync(modelAlias);
-                //if (model == null)
-                //{
-                //    Console.WriteLine("找不到指定的模型，請確認模型別名是否正確，或是該模型是否已預載。");
-                //    return;
-                //}
-                //Console.WriteLine($"模型資訊: {model.Alias} ({model.Id})");
-
                 await model.DownloadAsync(progress =>
                 {
                     Console.Write($"\rDownloading model: {progress:F2}%");
@@ -67,18 +59,11 @@ namespace LLMLib
                         Console.WriteLine();
                     }
                 });
-                //string path = await model.GetPathAsync();
-                //Console.WriteLine($"模型路徑：{path}");
-
-                //await model!.LoadAsync();
-                //OpenAIChatClient chatClient = await model.GetChatClientAsync();
-
-
 
                 await model.LoadAsync();
                 await manager.StartWebServiceAsync(ct);
 
-                IChatClient chatClient2 = new OpenAI.Chat.ChatClient(
+                IChatClient chatClient = new OpenAI.Chat.ChatClient(
                     modelAlias, new ApiKeyCredential("1234"),
                     new OpenAI.OpenAIClientOptions
                     {
@@ -87,34 +72,39 @@ namespace LLMLib
                     ).AsIChatClient();
 
                 string exitCommand = "exit";
-                string userInput = "請你自我介紹";
-
+                string userInput = "請你自我介紹";       
+                List<ChatMessage> messages = new()
+                {
+                    new ChatMessage(ChatRole.Assistant, "你現在是個3C達人，回答請用繁體中文"),
+                    new ChatMessage(ChatRole.User, userInput)
+                };
                 while (userInput != exitCommand)
                 {
-                    //var c=new ChatMessage( ChatRole.Assistant, "你現在是個3C達人，回答請用繁體中文");
-                    List<ChatMessage> messages = new()
+                    StringBuilder responseText = new StringBuilder(); 
+                    var streaming = chatClient.GetStreamingResponseAsync(messages);
+                    await foreach (var chunk in streaming)
                     {
-                        new ChatMessage(ChatRole.Assistant, "你現在是個3C達人，回答請用繁體中文"),
-                        new ChatMessage(ChatRole.User, userInput)
-                    };
-                    var streamingResponse = chatClient2.GetStreamingResponseAsync(messages);
-                    var response = await chatClient2.GetResponseAsync(messages);
-                    Console.WriteLine(response.Text);
-                    //await foreach (var chunk in streamingResponse)
-                    //{    
-                    //    Console.Write(chunk.Text);
-                    //    Console.Out.Flush();
-                    //}
+                        if (!string.IsNullOrEmpty(chunk.Text))
+                        {
+                            Console.Write(chunk.Text);
+                            responseText.Append(chunk.Text);
+                        }
+                    }
+                    Console.WriteLine();
+                    messages.Add(new ChatMessage(ChatRole.Assistant, responseText.ToString()));
+
+                    //Console.WriteLine(response.Text);
                     Console.WriteLine();
                     Console.Write("請輸入下一個問題，或輸入 'exit' 結束對話：");
                     userInput = Console.ReadLine() ?? "";
-                    if (userInput != exitCommand)
+                    if (userInput == exitCommand)
                     {
                         Console.WriteLine("對話結束");
                     }
+                    messages.Add(new ChatMessage(ChatRole.User, userInput));
                 }
 
-                // Tidy up - unload the model
+                // remember to unload the model
                 await model.UnloadAsync();
             }
             catch (Exception ex)
