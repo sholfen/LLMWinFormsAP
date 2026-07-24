@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingHelperConsoleAP", "Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LLMRoutingLib", "LLMRoutingLib\LLMRoutingLib.csproj", "{3B6C734F-DB14-4984-A583-C8E4FD753A54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LLMRoutingConsoleAP", "LLMRoutingConsoleAP\LLMRoutingConsoleAP.csproj", "{74845B28-4999-4DA5-A3C2-6454673D26C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{3B6C734F-DB14-4984-A583-C8E4FD753A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B6C734F-DB14-4984-A583-C8E4FD753A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B6C734F-DB14-4984-A583-C8E4FD753A54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74845B28-4999-4DA5-A3C2-6454673D26C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74845B28-4999-4DA5-A3C2-6454673D26C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74845B28-4999-4DA5-A3C2-6454673D26C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74845B28-4999-4DA5-A3C2-6454673D26C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
