@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -26,7 +26,7 @@ namespace LLMWinFormsAP
 
         public ConfigReader(string path)
         {
-            StreamReader sr = new StreamReader(path);
+            using StreamReader sr = new StreamReader(path);
             string jsonStr = sr.ReadToEnd();
             _config = JsonSerializer.Deserialize<ConfigClass>(jsonStr)
                       ?? throw new InvalidOperationException("Failed to deserialize configuration.");

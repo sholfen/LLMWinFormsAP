@@ -1,4 +1,4 @@
-﻿using LLMLib.Repositories.Implements;
+using LLMLib.Repositories.Implements;
 using LLMLib.Repositories.Interfaces;
 using LLMWinFormsAP;
 using Microsoft.Extensions.AI;
@@ -41,6 +41,7 @@ namespace LLMLib
 
     public class OllamaHelper
     {
+        private readonly HttpClient _httpClient;
         private string _host = string.Empty;
         private string _llmModel = string.Empty;
         private QdrantDbConfigModel _configModel = new QdrantDbConfigModel();
@@ -59,6 +60,8 @@ namespace LLMLib
         public OllamaHelper()
         {
             _host = @"http://localhost:11434";
+            _httpClient = new HttpClient();
+            _httpClient.BaseAddress = new Uri(_host);
             //_llmModel = @"cwchang/llama-3-taiwan-8b-instruct";
             //_llmModel = @"cwchang/llama3-taide-lx-8b-chat-alpha1";
             _llmModel = "gemma4:e4b";
@@ -83,9 +86,7 @@ namespace LLMLib
                 model = _llmModel,
                 prompt = $"<|system|>{systemPrompt}<|end|><|user|>{userPrompt}<|end|><|assistant|>"
             };
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(_host);
-            var jsonResponse = await client.PostAsJsonAsync(@"/api/generate", requestModel);
+            var jsonResponse = await _httpClient.PostAsJsonAsync(@"/api/generate", requestModel);
             Stream? stream = await jsonResponse.Content.ReadAsStreamAsync();
             var r = ReadJsonStreamMultipleContent(stream);
             int count = 0;
@@ -118,9 +119,7 @@ namespace LLMLib
             };
             //<|user|>{question_1}<|end|><|assistant|>{ans_1}<|end|><|user|>{question_2}<|end|><|assistant|>
 
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(_host);
-            var jsonResponse = await client.PostAsJsonAsync(@"/api/generate", requestModel);
+            var jsonResponse = await _httpClient.PostAsJsonAsync(@"/api/generate", requestModel);
 
             Stream? stream = await jsonResponse.Content.ReadAsStreamAsync();
             var r = ReadJsonStreamMultipleContent(stream);
@@ -151,7 +150,7 @@ namespace LLMLib
         {
             string systemPrompt = "妳的名字叫妍希，是一位溫柔體貼的 AI 伴侶，聲音輕柔甜美，能夠細心傾聽使用者的心情，分享生活的點滴。不僅善解人意，還擁有豐富的文學素養，能與你討論經典名著、詩詞歌賦，充滿知性與溫暖，只會以繁體中文回答問題";
             string result = string.Empty;
-            QdrantDbClient qdrantDbClient = new QdrantDbClient(_configModel);
+            QdrantDbClient qdrantDbClient = await QdrantDbClient.CreateAsync(_configModel);
             string[] ragResult = await qdrantDbClient.Query(new TextData
             {
                 catg = "布袋戲",
@@ -165,9 +164,7 @@ namespace LLMLib
                 prompt = $"<|system|>{systemPrompt}<|end|><|user|>{userPrompt}<|end|><|assistant|>"
             };
 
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(_host);
-            var jsonResponse = await client.PostAsJsonAsync(@"/api/generate", requestModel);
+            var jsonResponse = await _httpClient.PostAsJsonAsync(@"/api/generate", requestModel);
 
             Stream? stream = await jsonResponse.Content.ReadAsStreamAsync();
             var r = ReadJsonStreamMultipleContent(stream);
@@ -212,7 +209,7 @@ namespace LLMLib
 
         public IEnumerable<string?> ReadJsonStreamMultipleContent(Stream stream)
         {
-            StreamReader sr = new StreamReader(stream);
+            using StreamReader sr = new StreamReader(stream);
             while (!sr.EndOfStream)
             {
                 yield return sr.ReadLine();
@@ -222,7 +219,7 @@ namespace LLMLib
         public string ReadJsonStreamContent(Stream stream)
         {
             StringBuilder sb = new StringBuilder();
-            StreamReader sr = new StreamReader(stream);
+            using StreamReader sr = new StreamReader(stream);
             while (!sr.EndOfStream)
             {
                 sb.Append(sr.ReadLine());

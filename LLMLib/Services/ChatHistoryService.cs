@@ -1,4 +1,4 @@
-﻿using LLMLib.Repositories.Interfaces;
+using LLMLib.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +19,7 @@ namespace LLMLib.Services
 
         public void AddUserMessage(string token, string message)
         {
-            _chatHistoryRepository.AddAssistantMessage(token, message);
+            _chatHistoryRepository.AddUserMessage(token, message);
         }
         public void AddAssistantMessage(string token, string message)
         {

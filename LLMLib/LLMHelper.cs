@@ -1,4 +1,4 @@
-﻿using Microsoft.Agents.AI;
+using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using Microsoft.ML.OnnxRuntimeGenAI;
 using ModelContextProtocol;
@@ -19,7 +19,7 @@ namespace LLMLib
         }
     }
 
-    public class LLMHelper
+    public class LLMHelper : IDisposable
     {
         private string _modelPath = string.Empty;
         private Thread _thread;
@@ -56,6 +56,11 @@ namespace LLMLib
                 _thread.Interrupt();
                 _thread.Join();
             }
+        }
+
+        public void Dispose()
+        {
+            _model?.Dispose();
         }
 
         public async Task TestMCPServer()

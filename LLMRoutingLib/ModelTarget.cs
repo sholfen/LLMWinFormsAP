@@ -8,5 +8,6 @@ namespace LLMRoutingLib
     {
         public string Type { get; set; } = string.Empty;
         public string ModelName { get; set; } = string.Empty;
+        public string Provider { get; set; } = "Ollama";
     }
 }

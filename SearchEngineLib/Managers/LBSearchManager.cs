@@ -1,4 +1,4 @@
-﻿using Lucene.Net.Analysis;
+using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
@@ -19,7 +19,7 @@ namespace SearchEngineManager
 		public string LongTextField { get; set; } = string.Empty;
 	}
 
-	public class LBSearchManager : ILBSearchManager
+	public class LBSearchManager : ILBSearchManager, IDisposable
 	{
 		private IndexWriter _writet;
 		private RAMDirectory _directory;
@@ -98,7 +98,7 @@ namespace SearchEngineManager
             Type type = typeof(T);
             T doc = default(T);
 			Analyzer a = new StandardAnalyzer(lv);
-			var dirReader = DirectoryReader.Open(_directory);
+			using var dirReader = DirectoryReader.Open(_directory);
 			var searcher = new IndexSearcher(dirReader);
 
 			string[] fnames = { "TextField1" };
@@ -123,9 +123,14 @@ namespace SearchEngineManager
 			//{
 			//	Console.WriteLine(item);
 			//}
-			dirReader.Dispose();
 
 			return results;
         }
+
+		public void Dispose()
+		{
+			_writet?.Dispose();
+			_directory?.Dispose();
+		}
 	}
 }

@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,10 +17,11 @@ namespace RAGLib.Models
 
         public static QdrantDbConfigModel? InitModel()
         {
-            StreamReader sr = new StreamReader(@"Config.json");
+            using StreamReader sr = new StreamReader(@"Config.json");
             string jsonStr = sr.ReadToEnd();
-            dynamic jsonModel = System.Text.Json.JsonSerializer.Deserialize<ExpandoObject>(jsonStr);
-            QdrantDbConfigModel? dbConfigModel = System.Text.Json.JsonSerializer.Deserialize<QdrantDbConfigModel>(jsonModel.QdrantDbConnection.ToString());
+            using var jsonDoc = System.Text.Json.JsonDocument.Parse(jsonStr);
+            var qdrantElement = jsonDoc.RootElement.GetProperty("QdrantDbConnection");
+            QdrantDbConfigModel? dbConfigModel = System.Text.Json.JsonSerializer.Deserialize<QdrantDbConfigModel>(qdrantElement.GetRawText());
             return dbConfigModel;
         }
     }

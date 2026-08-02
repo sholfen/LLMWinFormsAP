@@ -1,6 +1,6 @@
-﻿namespace FineTuningToolWinFormsAP
+namespace FineTuningToolWinFormsAP
 {
-    partial class mainForm
+    partial class MainForm
     {
         /// <summary>
         ///  Required designer variable.

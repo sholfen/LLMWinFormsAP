@@ -1,4 +1,4 @@
-﻿using Azure.AI.OpenAI;
+using Azure.AI.OpenAI;
 using Azure;
 using System;
 using System.Collections.Generic;
@@ -10,28 +10,36 @@ using Qdrant.Client;
 using Qdrant.Client.Grpc;
 using System.Net.Http.Json;
 using OpenAI.Embeddings;
-using System.Dynamic;
 
 namespace RAGLib.VectorDB.Qdrant
 {
-    public class QdrantDbClient: IVectorDBClient
+    public class QdrantDbClient: IVectorDBClient, IDisposable
     {
         private readonly string _deploymentName;
         private readonly string _colName = "text_embedding";
         private readonly QdrantClient _qdrantClient;
         private readonly string _ollamaHost = @"http://localhost:11434";
+        private readonly HttpClient _httpClient;
 
-        public QdrantDbClient(QdrantDbConfigModel configModel)
+        private QdrantDbClient(QdrantDbConfigModel configModel)
         {
             _deploymentName = configModel.DeploymentName;
             _qdrantClient = new QdrantClient(configModel.Host, configModel.Port, false, configModel.ApiKey);
-            if (!_qdrantClient.CollectionExistsAsync(_colName).Result)
+            _httpClient = new HttpClient();
+            _httpClient.BaseAddress = new Uri(_ollamaHost);
+        }
+
+        public static async Task<QdrantDbClient> CreateAsync(QdrantDbConfigModel configModel)
+        {
+            var client = new QdrantDbClient(configModel);
+            if (!await client._qdrantClient.CollectionExistsAsync(client._colName))
             {
-                _qdrantClient.CreateCollectionAsync(_colName,
-                    new VectorParams { Size = configModel.VectorSize, Distance = Distance.Cosine }).Wait();
+                await client._qdrantClient.CreateCollectionAsync(client._colName,
+                    new VectorParams { Size = configModel.VectorSize, Distance = Distance.Cosine });
             }
 
-            var count = _qdrantClient.CountAsync(_colName).Result;
+            var count = await client._qdrantClient.CountAsync(client._colName);
+            return client;
         }
 
         public async Task InitData()
@@ -52,16 +60,14 @@ namespace RAGLib.VectorDB.Qdrant
 
         public async Task<float[]> GetEmbeddings(TextData textData)
         {
-            HttpClient httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(_ollamaHost);
             var requestModel = new
             {
                 model = @"tazarov/all-minilm-l6-v2-f32",
                 input = textData.text
             };
-            var jsonResponse = await httpClient.PostAsJsonAsync(@"/api/embed", requestModel);
+            var jsonResponse = await _httpClient.PostAsJsonAsync(@"/api/embed", requestModel);
             Stream? stream = await jsonResponse.Content.ReadAsStreamAsync();
-            StreamReader sr = new StreamReader(stream);
+            using StreamReader sr = new StreamReader(stream);
             string jsonStr = sr.ReadToEnd();
             var embeddingResult = System.Text.Json.JsonSerializer.Deserialize<EmbeddingResult>(jsonStr);
             Console.WriteLine($"Printing embedding result: {textData.text}");
@@ -82,10 +88,11 @@ namespace RAGLib.VectorDB.Qdrant
 
         public float[] GetEmbeddingsByAzure(string text)
         {
-            StreamReader sr = new StreamReader(@"Config.json");
+            using StreamReader sr = new StreamReader(@"Config.json");
             string jsonStr = sr.ReadToEnd();
-            dynamic jsonModel = System.Text.Json.JsonSerializer.Deserialize<ExpandoObject>(jsonStr);
-            AzureConfigModel? azureConfigModel = System.Text.Json.JsonSerializer.Deserialize<AzureConfigModel>(jsonModel.AzureAPI.ToString());
+            using var jsonDoc = System.Text.Json.JsonDocument.Parse(jsonStr);
+            var azureElement = jsonDoc.RootElement.GetProperty("AzureAPI");
+            AzureConfigModel? azureConfigModel = System.Text.Json.JsonSerializer.Deserialize<AzureConfigModel>(azureElement.GetRawText());
 
 
             var endpoint = new Uri(azureConfigModel.Host);
@@ -105,25 +112,28 @@ namespace RAGLib.VectorDB.Qdrant
 
         public async Task InsertData(List<TextData> textList)
         {
-            var points = textList.Select(t =>
+            var points = new List<PointStruct>();
+            foreach (var t in textList)
             {
                 var catg = t.catg;
                 var text = t.text;
                 PointId id = new PointId();
                 id.Uuid = Guid.NewGuid().ToString();
-                return new PointStruct
+                
+                var vectors = await GetEmbeddings(t);
+                points.Add(new PointStruct
                 {
 
                     Id = id,
-                    Vectors = GetEmbeddings(t).Result,
+                    Vectors = vectors,
                     //Vectors = GetEmbeddingsByAzure(t.text),
                     Payload =
                     {
                             ["catg"] = catg,
                             ["text"] = text
                     }
-                };
-            }).ToList();
+                });
+            }
             var updateResult = await _qdrantClient.UpsertAsync(_colName, points);
         }
 
@@ -149,6 +159,10 @@ namespace RAGLib.VectorDB.Qdrant
                 result.Add(text);
             }
             return result.ToArray();
+        }
+        public void Dispose()
+        {
+            _httpClient?.Dispose();
         }
     }
 }

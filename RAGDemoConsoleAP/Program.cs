@@ -1,4 +1,4 @@
-﻿
+
 using LLMLib;
 using LLMLib.Models;
 using RAGLib.Models;
@@ -37,12 +37,11 @@ if (imageResult != null && (imageResult.data != null && imageResult.data.Count()
     Console.WriteLine($"Image URL: {imageResult.data[0].url}");
 
     string fileName = $"{DateTime.Now:yyyyMMddHHmmss}.png";
-    HttpClient httpClient = new HttpClient();
+    using HttpClient httpClient = new HttpClient();
     using var downloadStream = await httpClient.GetStreamAsync(imageResult.data[0].url);
     using var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write);
     await downloadStream.CopyToAsync(fileStream);
     await fileStream.FlushAsync();
-    fileStream.Close();
 }
 else
 {

@@ -1,4 +1,4 @@
-﻿using LLMLib.Repositories.Interfaces;
+using LLMLib.Repositories.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.AI;
 using System;
@@ -19,22 +19,22 @@ namespace LLMLib.Repositories.Implements
             _sqlConnection = new SqlConnection("YourConnectionStringHere");
         }
 
-        public void AddAssistantMessage(string toekn, string message)
+        public void AddAssistantMessage(string token, string message)
         {
             throw new NotImplementedException();
         }
 
-        public void AddUserMessage(string toekn, string message)
+        public void AddUserMessage(string token, string message)
         {
             throw new NotImplementedException();
         }
 
-        public void ClearChatHistory(string toekn)
+        public void ClearChatHistory(string token)
         {
             throw new NotImplementedException();
         }
 
-        public List<ChatMessage> GetChatHistory(string toekn)
+        public List<ChatMessage> GetChatHistory(string token)
         {
             throw new NotImplementedException();
         }

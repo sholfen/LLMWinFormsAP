@@ -1,4 +1,4 @@
-﻿using RAGLib.Models;
+using RAGLib.Models;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -26,10 +26,10 @@ namespace LLMLib
 
         public void Init()
         {
-            StreamReader sr = new StreamReader(@"Config.json");
+            using StreamReader sr = new StreamReader(@"Config.json");
             string jsonStr = sr.ReadToEnd();
-            dynamic jsonModel = System.Text.Json.JsonSerializer.Deserialize<ExpandoObject>(jsonStr);
-            LLMConfigModel? configModel = System.Text.Json.JsonSerializer.Deserialize<LLMConfigModel>(jsonModel.TextImage.ToString());
+            using System.Text.Json.JsonDocument doc = System.Text.Json.JsonDocument.Parse(jsonStr);
+            LLMConfigModel? configModel = System.Text.Json.JsonSerializer.Deserialize<LLMConfigModel>(doc.RootElement.GetProperty("TextImage").GetRawText());
             Token = configModel.Token;
             EndPoint = configModel.EndPoint;
         }
@@ -51,7 +51,7 @@ namespace LLMLib
             requestMessage.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(requestModel), Encoding.UTF8, "application/json");
             var response = await _httpClient.SendAsync(requestMessage);
             var stream = await response.Content.ReadAsStreamAsync();
-            StreamReader streamReader = new StreamReader(stream);
+            using StreamReader streamReader = new StreamReader(stream);
             string jsonStr = streamReader.ReadToEnd();
             return jsonStr;
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +8,9 @@ namespace LLMLib.Repositories.Interfaces
 {
     public interface IChatHistoryRepository
     {
-        void AddUserMessage(string toekn, string message);
-        void AddAssistantMessage(string toekn, string message);
-        List<Microsoft.Extensions.AI.ChatMessage> GetChatHistory(string toekn);
-        void ClearChatHistory(string toekn);
+        void AddUserMessage(string token, string message);
+        void AddAssistantMessage(string token, string message);
+        List<Microsoft.Extensions.AI.ChatMessage> GetChatHistory(string token);
+        void ClearChatHistory(string token);
     }
 }

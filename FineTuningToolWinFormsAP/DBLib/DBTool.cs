@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using MySql.Data.MySqlClient;
 using System;
@@ -11,23 +11,27 @@ using System.Text.Json;
 
 namespace FineTuningToolWinFormsAP.DBLib
 {
-    public class DBTool
+    public class DBTool : IDisposable
     {
         //protected SqlConnection _sqlConnection { get; set; }
         protected MySqlConnection _sqlConnection { get; set; }
 
         public DBTool() 
         {
-            StreamReader sr = new StreamReader(@"Config.json");
+            using StreamReader sr = new StreamReader(@"Config.json");
             string jsonStr = sr.ReadToEnd();
-            dynamic jsonModel = JsonSerializer.Deserialize<ExpandoObject>(jsonStr);
-            string connectionObj = jsonModel.ConnectionString.ToString();
-            dynamic connectionModel = JsonSerializer.Deserialize<ExpandoObject>(connectionObj);
-            //MySqlConnection mySqlConnection = new MySqlConnection(connectionModel.Local.ToString());
-            _sqlConnection = new MySqlConnection(connectionModel.Local.ToString());
+            using var jsonDoc = System.Text.Json.JsonDocument.Parse(jsonStr);
+            var connElement = jsonDoc.RootElement.GetProperty("ConnectionString");
+            var localConn = connElement.GetProperty("Local").GetString();
+            _sqlConnection = new MySqlConnection(localConn);
         }
 
-        public async Task InserData(FineTuningBaseClassList fineTuningBaseClassList)
+        public void Dispose()
+        {
+            _sqlConnection?.Dispose();
+        }
+
+        public async Task InsertData(FineTuningBaseClassList fineTuningBaseClassList)
         {
             foreach (var item in fineTuningBaseClassList.messages)
             {
@@ -52,6 +56,7 @@ namespace FineTuningToolWinFormsAP.DBLib
                 if (count >= 2)
                 {
                     jsonLineResult.messages.Add(item);
+                    finalList.Add(jsonLineResult);
                     jsonLineResult = new FineTuningBaseClassList
                     {
                         messages = new List<FineTuningBaseClass>()
