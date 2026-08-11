@@ -50,10 +50,7 @@ namespace LLMLib
             };
             requestMessage.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(requestModel), Encoding.UTF8, "application/json");
             var response = await _httpClient.SendAsync(requestMessage);
-            var stream = await response.Content.ReadAsStreamAsync();
-            using StreamReader streamReader = new StreamReader(stream);
-            string jsonStr = streamReader.ReadToEnd();
-            return jsonStr;
+            return await response.Content.ReadAsStringAsync();
         }
     }
 }

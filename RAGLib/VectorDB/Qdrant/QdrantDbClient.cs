@@ -20,6 +20,7 @@ namespace RAGLib.VectorDB.Qdrant
         private readonly QdrantClient _qdrantClient;
         private readonly string _ollamaHost = @"http://localhost:11434";
         private readonly HttpClient _httpClient;
+        private AzureConfigModel? _azureConfigModel;
 
         private QdrantDbClient(QdrantDbConfigModel configModel)
         {
@@ -86,14 +87,21 @@ namespace RAGLib.VectorDB.Qdrant
             return embeddingResult.embeddings[0];
         }
 
-        public float[] GetEmbeddingsByAzure(string text)
+        private AzureConfigModel LoadAzureConfig()
         {
+            if (_azureConfigModel != null) return _azureConfigModel;
             using StreamReader sr = new StreamReader(@"Config.json");
             string jsonStr = sr.ReadToEnd();
             using var jsonDoc = System.Text.Json.JsonDocument.Parse(jsonStr);
             var azureElement = jsonDoc.RootElement.GetProperty("AzureAPI");
-            AzureConfigModel? azureConfigModel = System.Text.Json.JsonSerializer.Deserialize<AzureConfigModel>(azureElement.GetRawText());
+            _azureConfigModel = System.Text.Json.JsonSerializer.Deserialize<AzureConfigModel>(azureElement.GetRawText())
+                ?? throw new InvalidOperationException("Failed to deserialize AzureConfigModel.");
+            return _azureConfigModel;
+        }
 
+        public float[] GetEmbeddingsByAzure(string text)
+        {
+            var azureConfigModel = LoadAzureConfig();
 
             var endpoint = new Uri(azureConfigModel.Host);
             var apiKey = azureConfigModel.ApiKey;

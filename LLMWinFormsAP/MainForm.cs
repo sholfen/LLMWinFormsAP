@@ -94,14 +94,15 @@ namespace LLMWinFormsAP
         {
             try
             {
-                txtResponse.Text += txtPrompt.Text + Environment.NewLine + Environment.NewLine;
+                var sb = new System.Text.StringBuilder(txtResponse.Text);
+                sb.Append(txtPrompt.Text).Append(Environment.NewLine).Append(Environment.NewLine);
                 await foreach (var item in _OllamaHelper.SendPromptWithChatMessages(txtPrompt.Text))
                 {
-                    txtResponse.Text += item.Text;
+                    sb.Append(item.Text);
+                    txtResponse.Text = sb.ToString();
                 }
-                txtResponse.Text += Environment.NewLine;
-
-
+                sb.Append(Environment.NewLine);
+                txtResponse.Text = sb.ToString();
 
                 //var viewer = new MarkdownViewer();
                 await resMarkdownViewer.LoadMarkdownFromStringAsync(txtResponse.Text);

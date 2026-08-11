@@ -20,7 +20,7 @@ namespace FineTuningToolWinFormsAP.DBLib
         {
             using StreamReader sr = new StreamReader(@"Config.json");
             string jsonStr = sr.ReadToEnd();
-            using var jsonDoc = System.Text.Json.JsonDocument.Parse(jsonStr);
+            using var jsonDoc = JsonDocument.Parse(jsonStr);
             var connElement = jsonDoc.RootElement.GetProperty("ConnectionString");
             var localConn = connElement.GetProperty("Local").GetString();
             _sqlConnection = new MySqlConnection(localConn);
@@ -33,12 +33,8 @@ namespace FineTuningToolWinFormsAP.DBLib
 
         public async Task InsertData(FineTuningBaseClassList fineTuningBaseClassList)
         {
-            foreach (var item in fineTuningBaseClassList.messages)
-            {
-                string query =
-                    $"INSERT INTO demo.FineTuningData (role,content) VALUES (@role,@content)";
-                 await _sqlConnection.ExecuteAsync(query, item);
-            }
+            string query = "INSERT INTO demo.FineTuningData (role,content) VALUES (@role,@content)";
+            await _sqlConnection.ExecuteAsync(query, fineTuningBaseClassList.messages);
         }
 
         public async Task<List<FineTuningBaseClassList>> Query()

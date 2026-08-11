@@ -57,11 +57,21 @@ namespace LLMRoutingLib
 
         public async Task<string> GetCategoryByPrompt(string userPrompt)
         {
-
+            string categories = string.Join("\n", _modelTypes.Select(mt => mt.Type));
             string systemPrompt = "你是分類提示詞類型的助手，依提示詞的類型進行分類。分類有以下幾種，記得，只回應對應類型的問題類型，不要有其它的內容，例如只回應Coding。";
-            systemPrompt += $"{systemPrompt}\n\n分類類型如下:\n{string.Join("\n", _modelTypes.Select(mt => $"{mt.Type}"))}";
-            string prompt = $"<|system|>{systemPrompt}<|end|><|user|>{userPrompt}<|end|><|assistant|>";
-            var response = await _chatClient.GetResponseAsync(prompt);
+            systemPrompt = $"{systemPrompt}\n\n分類類型如下:\n{categories}";
+            //string prompt = $"<|system|>{systemPrompt}<|end|><|user|>{userPrompt}<|end|><|assistant|>";
+            //var response = await _chatClient.GetResponseAsync(prompt);
+
+
+            var messages = new List<ChatMessage>
+            {
+                new(Microsoft.Extensions.AI.ChatRole.System, systemPrompt),
+                new(Microsoft.Extensions.AI.ChatRole.User, userPrompt)
+            };
+            var response = await _chatClient.GetResponseAsync(messages);
+
+
             string modelType = response.Text;
 
             return modelType;

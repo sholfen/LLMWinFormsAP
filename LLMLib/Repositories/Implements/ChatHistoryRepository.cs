@@ -10,7 +10,7 @@ namespace LLMLib.Repositories.Implements
 {
     public class ChatHistoryRepository : IChatHistoryRepository
     {
-        private ConcurrentDictionary<string, List<Microsoft.Extensions.AI.ChatMessage>> _chatHistoryDictionary = new ConcurrentDictionary<string, List<Microsoft.Extensions.AI.ChatMessage>>();
+        private ConcurrentDictionary<string, ConcurrentQueue<Microsoft.Extensions.AI.ChatMessage>> _chatHistoryDictionary = new ConcurrentDictionary<string, ConcurrentQueue< Microsoft.Extensions.AI.ChatMessage>>();
 
         public ChatHistoryRepository() 
         {
@@ -19,34 +19,25 @@ namespace LLMLib.Repositories.Implements
 
         public void AddUserMessage(string token, string message)
         {
-            if (!_chatHistoryDictionary.ContainsKey(token))
-            {
-                _chatHistoryDictionary[token] = new List<Microsoft.Extensions.AI.ChatMessage>();
-            }
-            _chatHistoryDictionary[token].Add(new Microsoft.Extensions.AI.ChatMessage(Microsoft.Extensions.AI.ChatRole.User, message));
+            var list = _chatHistoryDictionary.GetOrAdd(token, _ => new ConcurrentQueue<Microsoft.Extensions.AI.ChatMessage>());
+            list.Enqueue(new Microsoft.Extensions.AI.ChatMessage(Microsoft.Extensions.AI.ChatRole.User, message));
         }
         public void AddAssistantMessage(string token, string message)
         {
-            if (!_chatHistoryDictionary.ContainsKey(token))
-            {
-                _chatHistoryDictionary[token] = new List<Microsoft.Extensions.AI.ChatMessage>();
-            }
-            _chatHistoryDictionary[token].Add(new Microsoft.Extensions.AI.ChatMessage(Microsoft.Extensions.AI.ChatRole.Assistant, message));
+            var list = _chatHistoryDictionary.GetOrAdd(token, _ => new ConcurrentQueue<Microsoft.Extensions.AI.ChatMessage>());
+            list.Enqueue(new Microsoft.Extensions.AI.ChatMessage(Microsoft.Extensions.AI.ChatRole.Assistant, message));
         }
         public List<Microsoft.Extensions.AI.ChatMessage> GetChatHistory(string token)
         {
-            if (_chatHistoryDictionary.ContainsKey(token))
+            if (_chatHistoryDictionary.TryGetValue(token, out var list))
             {
-                return _chatHistoryDictionary[token].ToList();
+                return list.ToList();
             }
             return new List<Microsoft.Extensions.AI.ChatMessage>();
         }
         public void ClearChatHistory(string token)
         {
-            if(_chatHistoryDictionary.ContainsKey(token))
-            {
-                _chatHistoryDictionary.TryRemove(token, out _);
-            }
+            _chatHistoryDictionary.TryRemove(token, out _);
         }
     }
 }

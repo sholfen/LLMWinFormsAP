@@ -42,33 +42,16 @@ namespace SearchEngineManager
 				bool isNum = propertyInfo.PropertyType.IsNumericType();
 				if(isNum)
 				{
-					long num = long.Parse(propertyInfo.GetValue(contents).ToString());
-					var field = new NumericDocValuesField(nameof(propertyInfo.Name), num);
+					long num = long.Parse(propertyInfo.GetValue(contents)?.ToString() ?? "0");
+					var field = new NumericDocValuesField(propertyInfo.Name, num);
 					testD.Add(field);
 
                     continue;
 				}
-				var field2 = new TextField(nameof(propertyInfo.Name), propertyInfo.GetValue(contents).ToString(), Field.Store.YES);
+				var field2 = new TextField(propertyInfo.Name, propertyInfo.GetValue(contents)?.ToString(), Field.Store.YES);
 				testD.Add(field2);
 			}
-			Lucene.Net.Documents.FieldType fieldType = new Lucene.Net.Documents.FieldType();
-			fieldType.NumericType = NumericType.INT32;
-			fieldType.IsStored = true;
-			//Field field1 = new Field("aaa3", "values", fieldType);
-
 			var list = CreateTestDatas();
-			foreach (var testData in list)
-			{
-				var d = new Document()
-				{
-					//new StringField("GUID", PersonGuidToBeUpdated, Field.Store.YES),
-					new TextField(nameof(testData.TextField1), testData.TextField1, Field.Store.YES),
-					new NumericDocValuesField(nameof(testData.NumField1), testData.NumField1),
-					new TextField(nameof(testData.LongTextField), testData.LongTextField, Field.Store.YES),
-				};
-			}
-
-			//_writet.AddDocument(testD);
 			_writet.AddDocuments(list.Select(testData => new Document()
 			{
 				//new StringField("GUID", PersonGuidToBeUpdated, Field.Store.YES),

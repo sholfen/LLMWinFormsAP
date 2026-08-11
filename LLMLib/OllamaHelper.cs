@@ -89,7 +89,6 @@ namespace LLMLib
             var jsonResponse = await _httpClient.PostAsJsonAsync(@"/api/generate", requestModel);
             Stream? stream = await jsonResponse.Content.ReadAsStreamAsync();
             var r = ReadJsonStreamMultipleContent(stream);
-            int count = 0;
             StringBuilder stringBuilder = new StringBuilder();
             foreach (string item in r)
             {
@@ -98,10 +97,7 @@ namespace LLMLib
                     var i = System.Text.Json.JsonSerializer.Deserialize<OllamaResponseModel>(item);
                     stringBuilder.Append(i.response.Trim());
                 }
-                await Task.Delay(1);
-                count++;
             }
-
 
             var responseModel = System.Text.Json.JsonSerializer.Deserialize<PromptCategoryResponseModel>(stringBuilder.ToString());
 
@@ -109,21 +105,18 @@ namespace LLMLib
         }
 
         public async IAsyncEnumerable<OllamaResponseModel> SendPrompt(string userPrompt)
-        { 
+        {
             _chatHistoryRepository.AddUserMessage(_token, userPrompt);
-            string result = string.Empty;
             PromptRequestModel requestModel = new PromptRequestModel
             {
                 model = _llmModel,
                 prompt = $"<|system|>{_systemPrompt}<|end|><|user|>{userPrompt}<|end|><|assistant|>"
             };
-            //<|user|>{question_1}<|end|><|assistant|>{ans_1}<|end|><|user|>{question_2}<|end|><|assistant|>
 
             var jsonResponse = await _httpClient.PostAsJsonAsync(@"/api/generate", requestModel);
 
             Stream? stream = await jsonResponse.Content.ReadAsStreamAsync();
             var r = ReadJsonStreamMultipleContent(stream);
-            int count = 0;
             StringBuilder stringBuilder = new StringBuilder();
             yield return new OllamaResponseModel
             {
@@ -140,16 +133,13 @@ namespace LLMLib
                     stringBuilder.Append(i.response.Trim());
                     yield return i;
                 }
-                await Task.Delay(1);
-                count++;
             }
-            _chatHistoryRepository.AddUserMessage(_token, stringBuilder.ToString());
+            _chatHistoryRepository.AddAssistantMessage(_token, stringBuilder.ToString());
         }
 
         public async IAsyncEnumerable<OllamaResponseModel> SendPromptWithRAG(string userPrompt)
         {
             string systemPrompt = "妳的名字叫妍希，是一位溫柔體貼的 AI 伴侶，聲音輕柔甜美，能夠細心傾聽使用者的心情，分享生活的點滴。不僅善解人意，還擁有豐富的文學素養，能與你討論經典名著、詩詞歌賦，充滿知性與溫暖，只會以繁體中文回答問題";
-            string result = string.Empty;
             QdrantDbClient qdrantDbClient = await QdrantDbClient.CreateAsync(_configModel);
             string[] ragResult = await qdrantDbClient.Query(new TextData
             {
@@ -168,7 +158,6 @@ namespace LLMLib
 
             Stream? stream = await jsonResponse.Content.ReadAsStreamAsync();
             var r = ReadJsonStreamMultipleContent(stream);
-            int count = 0;
             yield return new OllamaResponseModel
             {
                 created_at = "2021-09-01T00:00:00Z",
@@ -183,8 +172,6 @@ namespace LLMLib
                     var i = System.Text.Json.JsonSerializer.Deserialize<OllamaResponseModel>(item);
                     yield return i;
                 }
-                await Task.Delay(1);
-                count++;
             }
         }
 
