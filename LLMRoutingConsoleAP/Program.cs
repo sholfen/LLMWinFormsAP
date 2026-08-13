@@ -14,6 +14,8 @@ while(userInput != exitCommand)
         break;
     }
     string category = await routing.GetCategoryByPrompt(userInput);
-    string modelName = routing.GetModelName(category);
-    Console.WriteLine($"Result: Model: {modelName}, Category: {category}");
+    dynamic? categoryObj = System.Text.Json.JsonSerializer.Deserialize<dynamic>(category);
+    if(categoryObj == null ) throw new Exception("Failed to deserialize category response.");
+    string modelName = routing.GetModelName(categoryObj.category.ToString());
+    Console.WriteLine($"Result: Model: {modelName}, Category: {categoryObj.category}");
 }

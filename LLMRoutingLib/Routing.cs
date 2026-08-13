@@ -58,7 +58,13 @@ namespace LLMRoutingLib
         public async Task<string> GetCategoryByPrompt(string userPrompt)
         {
             string categories = string.Join("\n", _modelTypes.Select(mt => mt.Type));
-            string systemPrompt = "你是分類提示詞類型的助手，依提示詞的類型進行分類。分類有以下幾種，記得，只回應對應類型的問題類型，不要有其它的內容，例如只回應Coding。";
+            string systemPrompt = """
+                你是分類提示詞類型的助手，依提示詞的類型進行分類。分類有以下幾種，記得，回傳格式為JSON，不要有其它的內容，
+                格式如下：
+                {
+                    "category": "分類類型"
+                }
+                """;
             systemPrompt = $"{systemPrompt}\n\n分類類型如下:\n{categories}";
             //string prompt = $"<|system|>{systemPrompt}<|end|><|user|>{userPrompt}<|end|><|assistant|>";
             //var response = await _chatClient.GetResponseAsync(prompt);
